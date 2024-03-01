@@ -1,0 +1,11 @@
+===================================
+Configuration Memory information
+===================================
+File Format        MCS
+Interface          SPIX4
+Size               4M
+Start Address      0x00000000
+End Address        0x003FFFFF
+
+Addr1         Addr2         Date                    File(s)
+0x00000000    0x000E68FF    Feb 25 17:50:22 2024    /home/david/prj/my_repos/rustos/fpga/vivado/rustos/rustos.runs/impl_1/rustos_fpga_top.bit

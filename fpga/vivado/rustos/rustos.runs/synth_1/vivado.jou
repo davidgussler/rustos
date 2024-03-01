@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:13:54 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Fri Mar  1 17:35:06 2024
+# Process ID: 27814
+# Current directory: /home/david/prj/my_repos/rustos/fpga/vivado/rustos/rustos.runs/synth_1
+# Command line: vivado -log rustos_fpga_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source rustos_fpga_top.tcl
+# Log file: /home/david/prj/my_repos/rustos/fpga/vivado/rustos/rustos.runs/synth_1/rustos_fpga_top.vds
+# Journal file: /home/david/prj/my_repos/rustos/fpga/vivado/rustos/rustos.runs/synth_1/vivado.jou
+# Running On: krusty-krab, OS: Linux, CPU Frequency: 5500.000 MHz, CPU Physical cores: 20, Host memory: 67144 MB
+#-----------------------------------------------------------
+source rustos_fpga_top.tcl -notrace
