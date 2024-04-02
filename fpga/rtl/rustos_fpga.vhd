@@ -423,6 +423,6 @@ begin
   regi.status.sts1.data <= rego.control.ctl1.data;
 
   regi.cntr(0).cnt.incr <= '1' when rego.wr_pulse(0).data.swmod else '0';
-  regi.cntr(0).cnt.incr <= '1' when rego.wr_pulse(0).data.swmod else '0'; 
+  regi.cntr(1).cnt.incr <= '1' when rego.wr_pulse(1).data.swmod else '0'; 
   
 end architecture;
