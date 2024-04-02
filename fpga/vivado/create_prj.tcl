@@ -24,19 +24,22 @@ set_property library {neorv32} [get_files -filter {FILE_TYPE == VHDL}]
 
 # Add top level vhdl files
 add_files -fileset sources_1 [ glob \
-    ./../rtl/*.vhd
+    ./../rtl/*.vhd \
+    ./../regs/gen/vhdl/vhdl/*/*.vhd \
 ]
 
 # Set top level library
 set_property library ${prj_name} [get_files [ glob ./../rtl/*.vhd ]]
+set_property library ${prj_name} [get_files [ glob ./../regs/gen/vhdl/vhdl/examp_regs/*.vhd ]]    
+
+# Set desyrdl library
+set_property library desyrdl [get_files [ glob ./../regs/gen/vhdl/vhdl/desyrdl/*.vhd ]]
 
 # Set all VHDL files to VHDL'08
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
 
 # Update to set top file and compile order
 update_compile_order -fileset sources_1
-
-
 
 # Add constraints
 add_files -fileset constrs_1 [ glob \

@@ -1,4 +1,0 @@
-/home/david/prj/my_repos/rustos/fpga/regs/gen/examp_regs_vhdl/vhdl/desyrdl/pkg_desyrdl_common.vhd
-/home/david/prj/my_repos/rustos/fpga/regs/gen/examp_regs_vhdl/vhdl/examp_regs/pkg_examp_regs.vhd
-/home/david/prj/my_repos/rustos/fpga/regs/gen/examp_regs_vhdl/vhdl/examp_regs/examp_regs_decoder_axi4l.vhd
-/home/david/prj/my_repos/rustos/fpga/regs/gen/examp_regs_vhdl/vhdl/examp_regs/examp_regs.vhd

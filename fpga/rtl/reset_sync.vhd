@@ -38,7 +38,7 @@ architecture rtl of reset_sync is
 
   type sr_t is array (natural range 0 to G_SYNC_LEN) of
     std_logic_vector(G_NUM_SRST - 1 downto 0);
-  signal sr_tmp : sr_t := (others => G_SRST_LVL);
+  signal sr : sr_t := (others => G_SRST_LVL);
 
   -- Xilinx attributes
   attribute ASYNC_REG       : string;

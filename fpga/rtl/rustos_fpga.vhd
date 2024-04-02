@@ -5,10 +5,14 @@ use ieee.numeric_std.all;
 library neorv32;
 use neorv32.neorv32_package.all;
 
+use work.pkg_examp_regs.all;
+
 entity rustos_fpga is
   generic (
-    G_VER_MAJOR : std_logic_vector(15 downto 0) := x"0000";
-    G_VER_MINOR : std_logic_vector(15 downto 0) := x"0001"
+    G_ID        : std_logic_vector(31 downto 0) := x"0000_0001"; 
+    G_VER_MAJOR : std_logic_vector(7 downto 0)  := x"00";
+    G_VER_MINOR : std_logic_vector(7 downto 0)  := x"01";
+    G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00"
   );
   port (
     clk_i : in std_logic; 
@@ -99,27 +103,25 @@ architecture rtl of rustos_fpga is
   constant IO_CRC_EN                  : boolean                        := false;
 
   -- Ports
-  signal m_axi_aclk : std_logic;
-  signal m_axi_aresetn : std_logic;
-  signal m_axi_awaddr : std_logic_vector(31 downto 0);
-  signal m_axi_awprot : std_logic_vector(2 downto 0);
-  signal m_axi_awvalid : std_logic;
-  signal m_axi_awready : std_logic;
-  signal m_axi_wdata : std_logic_vector(31 downto 0);
-  signal m_axi_wstrb : std_logic_vector(3 downto 0);
-  signal m_axi_wvalid : std_logic;
-  signal m_axi_wready : std_logic;
-  signal m_axi_araddr : std_logic_vector(31 downto 0);
-  signal m_axi_arprot : std_logic_vector(2 downto 0);
-  signal m_axi_arvalid : std_logic;
-  signal m_axi_arready : std_logic;
-  signal m_axi_rdata : std_logic_vector(31 downto 0);
-  signal m_axi_rresp : std_logic_vector(1 downto 0);
-  signal m_axi_rvalid : std_logic;
-  signal m_axi_rready : std_logic;
-  signal m_axi_bresp : std_logic_vector(1 downto 0);
-  signal m_axi_bvalid : std_logic;
-  signal m_axi_bready : std_logic;
+  signal axi_awaddr : std_logic_vector(31 downto 0);
+  signal axi_awprot : std_logic_vector(2 downto 0);
+  signal axi_awvalid : std_logic;
+  signal axi_awready : std_logic;
+  signal axi_wdata : std_logic_vector(31 downto 0);
+  signal axi_wstrb : std_logic_vector(3 downto 0);
+  signal axi_wvalid : std_logic;
+  signal axi_wready : std_logic;
+  signal axi_araddr : std_logic_vector(31 downto 0);
+  signal axi_arprot : std_logic_vector(2 downto 0);
+  signal axi_arvalid : std_logic;
+  signal axi_arready : std_logic;
+  signal axi_rdata : std_logic_vector(31 downto 0);
+  signal axi_rresp : std_logic_vector(1 downto 0);
+  signal axi_rvalid : std_logic;
+  signal axi_rready : std_logic;
+  signal axi_bresp : std_logic_vector(1 downto 0);
+  signal axi_bvalid : std_logic;
+  signal axi_bready : std_logic;
   signal s0_axis_tdata : std_logic_vector(31 downto 0);
   signal s0_axis_tvalid : std_logic;
   signal s0_axis_tlast : std_logic;
@@ -170,16 +172,22 @@ architecture rtl of rustos_fpga is
   signal msw_irq_i : std_logic;
   signal mext_irq_i : std_logic;
 
+  signal clk_100m : std_logic; 
   signal mmcm_locked : std_logic;
   signal srst : std_logic;
-  signal arst : std_logic;
+  signal srst_n : std_logic;
+
+  signal examp_regs_m2s : t_examp_regs_m2s; 
+  signal examp_regs_s2m : t_examp_regs_s2m;
+  signal regi : t_addrmap_examp_regs_in; 
+  signal rego : t_addrmap_examp_regs_out; 
 
 begin
 
   clocking_inst : entity work.clocking
   port map (
     clk_i => clk_i, 
-    clk_o => m_axi_aclk, 
+    clk_o => clk_100m, 
     locked_o => mmcm_locked 
   );
 
@@ -192,12 +200,12 @@ begin
     G_SRST_LVL => b"10"
   )
   port map (
-    clk_i(0) => m_axi_aclk, 
-    clk_i(1) => m_axi_aclk, 
-    arst_i(0) => arst_i, 
-    arst_i(1) => mmcm_locked, 
-    srst_o(0) => m_axi_aresetn,
-    srst_o(1) => srst 
+    clks_i(0) => clk_100m, 
+    clks_i(1) => clk_100m, 
+    arsts_i(0) => arst_i, 
+    arsts_i(1) => mmcm_locked, 
+    srsts_o(0) => srst_n,
+    srsts_o(1) => srst 
   );
 
   uart_bit_sync_inst : entity work.bit_sync
@@ -205,7 +213,7 @@ begin
     G_WIDTH => 1
   )
   port map (
-    clk_i => m_axi_aclk, 
+    clk_i => clk_100m, 
     srst_i => '0',
     async_i(0) => uart_rx_i,
     sync_o(0) => uart0_rxd_i
@@ -218,7 +226,7 @@ begin
     G_WIDTH => sw_i'length
   )
   port map (
-    clk_i => m_axi_aclk, 
+    clk_i => clk_100m, 
     srst_i => '0',
     async_i => sw_i,
     sync_o => gpio_i(sw_i'RANGE)
@@ -302,27 +310,27 @@ begin
     IO_CRC_EN                  => IO_CRC_EN
   )
   port map (
-    m_axi_aclk     => m_axi_aclk,
-    m_axi_aresetn  => m_axi_aresetn,
-    m_axi_awaddr   => m_axi_awaddr,
-    m_axi_awprot   => m_axi_awprot,
-    m_axi_awvalid  => m_axi_awvalid,
-    m_axi_awready  => m_axi_awready,
-    m_axi_wdata    => m_axi_wdata,
-    m_axi_wstrb    => m_axi_wstrb,
-    m_axi_wvalid   => m_axi_wvalid,
-    m_axi_wready   => m_axi_wready,
-    m_axi_araddr   => m_axi_araddr,
-    m_axi_arprot   => m_axi_arprot,
-    m_axi_arvalid  => m_axi_arvalid,
-    m_axi_arready  => m_axi_arready,
-    m_axi_rdata    => m_axi_rdata,
-    m_axi_rresp    => m_axi_rresp,
-    m_axi_rvalid   => m_axi_rvalid,
-    m_axi_rready   => m_axi_rready,
-    m_axi_bresp    => m_axi_bresp,
-    m_axi_bvalid   => m_axi_bvalid,
-    m_axi_bready   => m_axi_bready,
+    m_axi_aclk     => clk_100m,
+    m_axi_aresetn  => srst_n,
+    m_axi_awaddr   => axi_awaddr,
+    m_axi_awprot   => axi_awprot,
+    m_axi_awvalid  => axi_awvalid,
+    m_axi_awready  => axi_awready,
+    m_axi_wdata    => axi_wdata,
+    m_axi_wstrb    => axi_wstrb,
+    m_axi_wvalid   => axi_wvalid,
+    m_axi_wready   => axi_wready,
+    m_axi_araddr   => axi_araddr,
+    m_axi_arprot   => axi_arprot,
+    m_axi_arvalid  => axi_arvalid,
+    m_axi_arready  => axi_arready,
+    m_axi_rdata    => axi_rdata,
+    m_axi_rresp    => axi_rresp,
+    m_axi_rvalid   => axi_rvalid,
+    m_axi_rready   => axi_rready,
+    m_axi_bresp    => axi_bresp,
+    m_axi_bvalid   => axi_bvalid,
+    m_axi_bready   => axi_bready,
     s0_axis_tdata  => s0_axis_tdata,
     s0_axis_tvalid => s0_axis_tvalid,
     s0_axis_tlast  => s0_axis_tlast,
@@ -373,4 +381,48 @@ begin
     msw_irq_i      => msw_irq_i,
     mext_irq_i     => mext_irq_i
   );
+
+  examp_regs_inst : entity work.examp_regs
+  port map (
+    pi_clock => clk_100m,
+    pi_reset => srst,
+    pi_s_reset => '0', 
+    pi_s_top   => examp_regs_m2s,
+    po_s_top   => examp_regs_s2m,
+    pi_addrmap => regi,
+    po_addrmap => rego
+  );
+
+  examp_regs_m2s.awaddr  <= axi_awaddr;
+  examp_regs_m2s.awprot  <= axi_awprot ;
+  examp_regs_m2s.awvalid <= axi_awvalid;
+  examp_regs_m2s.wdata   <= axi_wdata  ;
+  examp_regs_m2s.wstrb   <= axi_wstrb  ;
+  examp_regs_m2s.wvalid  <= axi_wvalid ;
+  examp_regs_m2s.bready  <= axi_bready ;
+  examp_regs_m2s.araddr  <= axi_araddr ;
+  examp_regs_m2s.arprot  <= axi_arprot ;
+  examp_regs_m2s.arvalid <= axi_arvalid;
+  examp_regs_m2s.rready  <= axi_rready ;
+  axi_awready            <= examp_regs_s2m.awready;
+  axi_wready             <= examp_regs_s2m.wready ;   
+  axi_bresp              <= examp_regs_s2m.bresp  ;   
+  axi_bvalid             <= examp_regs_s2m.bvalid ;   
+  axi_arready            <= examp_regs_s2m.arready;   
+  axi_rdata              <= examp_regs_s2m.rdata  ;   
+  axi_rresp              <= examp_regs_s2m.rresp  ;   
+  axi_rvalid             <= examp_regs_s2m.rvalid ;
+
+  regi.common.id.id.data <= G_ID; 
+  regi.common.version.major.data <= G_VER_MAJOR;
+  regi.common.version.minor.data <= G_VER_MINOR; 
+  regi.common.version.patch.data <= G_VER_PATCH;
+  regi.common.git.git.data <= (others => '0'); 
+
+  regi.status.sts0.data <= rego.control.ctl0.data;
+  regi.status.sts1.data <= rego.control.ctl1.data;
+
+  regi.cntr(0).cnt.incr <= '1' when rego.wr_pulse(0).data.swmod else '0';
+  regi.cntr(0).cnt.incr <= '1' when rego.wr_pulse(0).data.swmod else '0'; 
+  
 end architecture;

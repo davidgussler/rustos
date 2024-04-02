@@ -1,0 +1,42 @@
+regfile common_regfile {
+  name = "Common Register File";
+  desc = "These registers should be instantiated at the base address of an fpga.";
+
+  reg {
+    name = "Scratchpad Register";
+    desc = "Scratchpad register for testing.";
+    default sw = rw;
+    default hw = na;
+    field {} scratchpad[31:0] = 0x12345678;
+  } scratchpad;
+
+  reg {
+    name = "ID Register";
+    desc = "Read-only ID register. This is a unique identification number for this fpga design.";
+    default sw = r;
+    default hw = w;
+    field {} id[31:0];
+  } id;
+
+  reg {
+    name = "Version Register";
+    desc = "Read-only version register. Semantic versioning is used. In short: 
+      MAJOR version = incompatible API change;
+      MINOR version = new functionality added in a backward compatible manner;
+      PATCH version = backward compatible bug fix; 
+      For more information, see https://semver.org";
+    default sw = r;
+    default hw = w;
+    field {} major[23:16];
+    field {} minor[15:8];
+    field {} patch[7:0];
+  } version;
+
+  reg {
+    name = "Git Hash Register";
+    desc = "The last 8 characters of the git commit hash for this fpga design.";
+    default sw = r;
+    default hw = w;
+    field {} git[31:0];
+  } git;
+};

@@ -1,0 +1,64 @@
+// At this time, desyrdl does not support some sw access properties
+// depreciating this file for now.
+
+// -----------------------------------------------------------------------------
+// Reusable field types
+// -----------------------------------------------------------------------------
+
+// A field that is read and writable by software
+// and whose value is visible to hardware
+field rw_field_t #(string NAME = "", string DESC = ""){
+  name = NAME;
+  desc = DESC;
+  sw = rw;
+  hw = r;
+};
+
+// A read-only field driven by a hardware signal
+// No storage element
+field ro_field_t #(string NAME = "", string DESC = ""){
+  name = NAME;
+  desc = DESC;
+  sw = r;
+  hw = w;
+};
+
+// A field that read/writable by software, but is also writable by hardware
+field hwrw_field_t #(string NAME = "", string DESC = ""){
+  name = NAME;
+  desc = DESC;
+  sw = rw;
+  hw = rw;
+  we; // hardware has write-enable control.
+};
+
+// An up-counting counter
+field counter_field_t #(string NAME = "", string DESC = ""){
+  name = NAME;
+  desc = DESC;
+  sw = r;
+  counter; // is a counter that infers an increment control hardware input signal
+};
+
+// Field that is set by hardware, and cleard by software read
+field flag_field_t #(string NAME = "", string DESC = ""){
+  name = NAME;
+  desc = DESC;
+  sw = r;
+  hw = w;
+  hwset; // hardware control to set the field
+  onread = rclr; // cleared when read by software
+  precedence = hw; // if read and set at the same time, hardware wins.
+  reset = 0;
+};
+
+// Field that pulses a hardware singal for one clockcycle when a '1' is 
+// written.
+field pulse_field_t #(string NAME = "", string DESC = ""){
+  name = NAME;
+  desc = DESC;
+  sw = rw;
+  hw = r;
+  singlepulse;
+  reset = 0;
+};

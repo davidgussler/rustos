@@ -1,125 +1,57 @@
-
-//
-// Reusable fields
-//
-field rw_field_t {
-    // A field that is read and writable by software
-    sw = rw;
-    // and whose value is visible to hardware
-    hw = r;
-};
-
-// A read-only field driven by a hardware signal
-// No storage element
-field ro_field_t {
-    sw = r;
-    hw = w;
-};
-
-// a field that read/writable by software, but is also writable by hardware
-field hw_rw_field_t {
-    sw = rw;
-    hw = rw;
-    we; // hardware has write-enable control.
-};
-
-// An up-counting counter
-field counter_field_t {
-    sw = r;
-    counter; // is a counter that infers an increment control hardware input signal
-};
-
-// Field that is set by hardware, and cleard by software read
-field event_flag_field_t {
-    sw = r;
-    hw = w;
-    hwset; // Hardware control to set the field
-    onread = rclr; // cleared when read by software
-    precedence = hw; // if read and set at the same time, hardware wins.
-};
-
 addrmap examp_regs {
-    name = "RDL Example";
-    desc = "Example register description.";
+  name = "RDL Example";
+  desc = "Example register description.";
 
-    default accesswidth = 32;
-    default regwidth = 32;
+  default accesswidth = 32;
+  default regwidth = 32;
 
-    reg {
-        name = "Scratchpad Register";
-        desc = "Scratchpad register for FPGA firmware testing.";
+  common_regfile common; 
 
-        field {
-            sw = rw;
-            hw = r;
-        } scratchpad[31:0] = 0;
+  reg {
+    name = "Control Register";
+    desc = "Overall control register.";
+    default sw = rw;
+    default hw = r;
+    field {} ctl0[0:0] = 1;
+    field {} ctl1[1:1] = 1;
+  } control;
 
-    } scratchpad @ 0x0;
+  reg {
+    name = "Status Register";
+    desc = "Overall status register.";
+    default sw = r;
+    default hw = w;
+    field {
+      name = "Status 0";
+    } sts0[0:0];
+    field {
+      name = "Status 1";
+    } sts1[1:1];
+  } status;
 
-    reg {
-        name = "FPGA Verison Register";
-        desc = "Read-only FPGA version register. A new version here indicates 
-        that the FPGA HDL has changed in some meaningful way.";
+  reg {
+    desc = "SW and HW can write, we flag needed to trigger write from hw. Also include outputs for swacc (rd / wr) and swmod (wr)";
+    default sw = rw;
+    default hw = rw;
+    default we;
+    default swacc;
+    default swmod;
+    field {} data[32] = 0x0000000B;
+  } hwrw;
 
-        field {
-            sw = r;
-            hw = w;
-        } major[31:16];
+  reg {
+    desc = "Write pulse register. Just a write pulse";
+    default sw = w;
+    default hw = r;
+    default swmod;
+    field {} data = 0;
+  } wr_pulse [2];
 
-        field {
-            sw = r;
-            hw = w;
-        } minor[15:0];
-
-    } version @ 0x4;
-
-    reg {
-        name = "Control Register";
-        desc = "Overall control register.";
-
-        field {
-            name = "Control 0";
-            sw = rw;
-            hw = r;
-        } ctl0[0:0] = 1;
-        
-        field {
-            name = "Control 1";
-            sw = rw;
-            hw = r;
-        } ctl1[1:1] = 1;
-
-    } control @ 0x8;
-
-    reg {
-        name = "Status Register";
-        desc = "Overall status register.";
-
-        field {
-            name = "Status 0";
-            sw = r;
-            hw = w;
-        } sts0[0:0];
-
-        field {
-            name = "Status 1";
-            sw = r;
-            hw = w;
-        } sts1[1:1];
-
-    } status @ 0xC;
-
-    reg {
-        name = "Mixed Register";
-        desc = "Mixed register with loads of functionality.";
-
-        counter_field_t count0[7:0] = 0;
-        count0->name = "Incrementing Count Register";
-
-        event_flag_field_t events[15:8] = 0;
-        events->name = "Events Register";
-        events->desc = "Description of events register.";
-
-    } mixed[4] @ 0x10; // Array starting at address 10
+  reg {
+    desc = "Counter register. Just a simple up counter";
+    default sw = r;
+    default counter; // is a counter that infers an increment control hardware input signal
+    field {} cnt[15:0] = 0;
+  } cntr [2];
 
 };

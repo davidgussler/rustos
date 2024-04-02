@@ -1,13 +1,14 @@
--- All this file does is map PCB net names to FPGA net names
+-- Map PCB net names to FPGA net names
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
 
 entity rustos_fpga_top is
   generic (
-    G_VER_MAJOR : std_logic_vector(15 downto 0) := x"0000";
-    G_VER_MINOR : std_logic_vector(15 downto 0) := x"0001"
+    G_ID        : std_logic_vector(31 downto 0) := x"0000_0001"; 
+    G_VER_MAJOR : std_logic_vector(7 downto 0)  := x"00";
+    G_VER_MINOR : std_logic_vector(7 downto 0)  := x"01";
+    G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00"
   );
   port (
     clk : in std_logic; 
@@ -27,8 +28,10 @@ begin
 
   rustos_fpga_inst : entity work.rustos_fpga
   generic map (
+    G_ID=> G_ID,
     G_VER_MAJOR => G_VER_MAJOR,
-    G_VER_MINOR => G_VER_MINOR
+    G_VER_MINOR => G_VER_MINOR,
+    G_VER_PATCH=> G_VER_PATCH
   )
   port map (
     clk_i     => clk,
