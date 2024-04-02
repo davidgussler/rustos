@@ -184,13 +184,21 @@ begin
   );
 
   reset_sync_inst : entity work.reset_sync
+  generic map (
+    G_SYNC_LEN => 2,
+    G_NUM_ARST => 2,
+    G_NUM_SRST => 2,
+    G_ARST_LVL => b"01",
+    G_SRST_LVL => b"10"
+  )
   port map (
-    clk_i => m_axi_aclk, 
-    arst_i => arst, 
-    srst_o => srst 
+    clk_i(0) => m_axi_aclk, 
+    clk_i(1) => m_axi_aclk, 
+    arst_i(0) => arst_i, 
+    arst_i(1) => mmcm_locked, 
+    srst_o(0) => m_axi_aresetn,
+    srst_o(1) => srst 
   );
-  arst <= arst_i or not mmcm_locked;
-  m_axi_aresetn <= not srst;
 
   uart_bit_sync_inst : entity work.bit_sync
   generic map (
@@ -198,6 +206,7 @@ begin
   )
   port map (
     clk_i => m_axi_aclk, 
+    srst_i => '0',
     async_i(0) => uart_rx_i,
     sync_o(0) => uart0_rxd_i
   );
@@ -210,6 +219,7 @@ begin
   )
   port map (
     clk_i => m_axi_aclk, 
+    srst_i => '0',
     async_i => sw_i,
     sync_o => gpio_i(sw_i'RANGE)
   );

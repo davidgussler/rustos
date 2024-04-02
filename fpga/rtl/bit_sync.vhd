@@ -1,23 +1,20 @@
--- #############################################################################
--- # File     : bit_sync.vhd
--- # Author   : David Gussler
--- # Language : VHDL '08
--- # ===========================================================================
--- # Simple bit synchronizer. This can also be used to sync one bit or several 
--- # unrelated bits to a common clock.  
--- # ===========================================================================
--- # Copyright (c) 2023-2024, David Gussler. All rights reserved.
--- #
--- # You may use, distribute and modify this code under the
--- # terms of the BSD 2-Clause license. You should have received a copy of the 
--- # license with this file. If not, please message: davndnguss@gmail.com. 
--- #############################################################################
+--#############################################################################
+--# File     : bit_sync.vhd
+--# Author   : David Gussler
+--# Language : VHDL '08
+--# ===========================================================================
+--# Copyright (c) 2023-2024, David Gussler. All rights reserved.
+--# You may use, distribute and modify this code under the
+--# terms of the BSD 2-Clause license. You should have received a copy of the 
+--# license with this file. If not, please message: davndnguss@gmail.com. 
+--# ===========================================================================
+--! Simple bit synchronizer. This can be used to sync one bit or several 
+--! unrelated bits to a common clock.
+-- ############################################################################
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
-use work.gen_types_pkg.all;
 
 entity bit_sync is
   generic (
@@ -36,13 +33,12 @@ end entity;
 architecture rtl of bit_sync is
 
   type sr_t is array (natural range 0 to G_SYNC_LEN) of
-  std_logic_vector(async_i'length - 1 downto 0);
+    std_logic_vector(async_i'length - 1 downto 0);
   signal sr : sr_t := (others => G_RST_VAL);
 
   -- Xilinx Attributes
   attribute ASYNC_REG       : string;
   attribute ASYNC_REG of sr : signal is "TRUE";
-
   attribute SHREG_EXTRACT       : string;
   attribute SHREG_EXTRACT of sr : signal is "NO";
 

@@ -71,7 +71,7 @@ proc create_report { reportName command } {
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
 set_param checkpoint.writeSynthRtdsInDcp 1
-set_param synth.incrementalSynthesisCache ./.Xil/Vivado-20702-krusty-krab/incrSyn
+set_param synth.incrementalSynthesisCache ./.Xil/Vivado-5843-krusty-krab/incrSyn
 set_msg_config -id {Synth 8-256} -limit 10000
 set_msg_config -id {Synth 8-638} -limit 10000
 OPTRACE "Creating in-memory project" START { }
@@ -89,7 +89,6 @@ set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
 read_vhdl -vhdl2008 -library rustos {
-  /home/david/prj/my_repos/rustos/fpga/rtl/gen_types_pkg.vhd
   /home/david/prj/my_repos/rustos/fpga/rtl/bit_sync.vhd
   /home/david/prj/my_repos/rustos/fpga/rtl/clocking.vhd
   /home/david/prj/my_repos/rustos/fpga/rtl/reset_sync.vhd
