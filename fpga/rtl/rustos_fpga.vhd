@@ -12,7 +12,8 @@ entity rustos_fpga is
     G_ID        : std_logic_vector(31 downto 0) := x"0000_0001"; 
     G_VER_MAJOR : std_logic_vector(7 downto 0)  := x"00";
     G_VER_MINOR : std_logic_vector(7 downto 0)  := x"01";
-    G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00"
+    G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00";
+    G_GIT_HASH  : std_logic_vector(31 downto 0) := x"0000_0000"
   );
   port (
     clk_i : in std_logic; 
@@ -417,7 +418,7 @@ begin
   regi.common.version.major.data <= G_VER_MAJOR;
   regi.common.version.minor.data <= G_VER_MINOR; 
   regi.common.version.patch.data <= G_VER_PATCH;
-  regi.common.git.git.data <= (others => '0'); 
+  regi.common.git.git.data <= G_GIT_HASH; 
 
   regi.status.sts0.data <= rego.control.ctl0.data;
   regi.status.sts1.data <= rego.control.ctl1.data;
