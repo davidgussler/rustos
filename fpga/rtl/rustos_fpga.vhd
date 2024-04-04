@@ -9,11 +9,10 @@ use work.pkg_examp_regs.all;
 
 entity rustos_fpga is
   generic (
-    G_ID        : std_logic_vector(31 downto 0) := x"0000_0001"; 
-    G_VER_MAJOR : std_logic_vector(7 downto 0)  := x"00";
-    G_VER_MINOR : std_logic_vector(7 downto 0)  := x"01";
-    G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00";
-    G_GIT_HASH  : std_logic_vector(31 downto 0) := x"0000_0000"
+    G_VER_MAJOR : std_logic_vector(7 downto 0)  := x"00"; --! Updated by build script
+    G_VER_MINOR : std_logic_vector(7 downto 0)  := x"00"; --! Updated by build script
+    G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00"; --! Updated by build script
+    G_GIT_HASH  : std_logic_vector(31 downto 0) := x"0000_0000" --! Updated by build script
   );
   port (
     clk_i : in std_logic; 
@@ -28,6 +27,9 @@ entity rustos_fpga is
 end entity;
 
 architecture rtl of rustos_fpga is
+
+  -- ID info
+  constant FPGA_ID        : std_logic_vector(31 downto 0) := x"0000_0001"; 
 
   -- CPU Configuration
   constant CLOCK_FREQUENCY            : natural                        := 100_000_000;
@@ -182,6 +184,12 @@ architecture rtl of rustos_fpga is
   signal examp_regs_s2m : t_examp_regs_s2m;
   signal regi : t_addrmap_examp_regs_in; 
   signal rego : t_addrmap_examp_regs_out; 
+
+  signal swmod_ff : std_logic;
+  signal awaddr : std_logic_vector(31 downto 0);
+  signal araddr : std_logic_vector(31 downto 0);
+
+  
 
 begin
 
@@ -383,25 +391,17 @@ begin
     mext_irq_i     => mext_irq_i
   );
 
-  examp_regs_inst : entity work.examp_regs
-  port map (
-    pi_clock => clk_100m,
-    pi_reset => srst,
-    pi_s_reset => '0', 
-    pi_s_top   => examp_regs_m2s,
-    po_s_top   => examp_regs_s2m,
-    pi_addrmap => regi,
-    po_addrmap => rego
-  );
+  awaddr <= x"00_0000" & axi_awaddr(7 downto 0) when axi_awaddr(31 downto 8) = x"F0_0000" else axi_awaddr;
+  araddr <= x"00_0000" & axi_araddr(7 downto 0) when axi_araddr(31 downto 8) = x"F0_0000" else axi_araddr;
 
-  examp_regs_m2s.awaddr  <= axi_awaddr;
+  examp_regs_m2s.awaddr  <= awaddr;
   examp_regs_m2s.awprot  <= axi_awprot ;
   examp_regs_m2s.awvalid <= axi_awvalid;
   examp_regs_m2s.wdata   <= axi_wdata  ;
   examp_regs_m2s.wstrb   <= axi_wstrb  ;
   examp_regs_m2s.wvalid  <= axi_wvalid ;
   examp_regs_m2s.bready  <= axi_bready ;
-  examp_regs_m2s.araddr  <= axi_araddr ;
+  examp_regs_m2s.araddr  <= araddr;
   examp_regs_m2s.arprot  <= axi_arprot ;
   examp_regs_m2s.arvalid <= axi_arvalid;
   examp_regs_m2s.rready  <= axi_rready ;
@@ -414,16 +414,35 @@ begin
   axi_rresp              <= examp_regs_s2m.rresp  ;   
   axi_rvalid             <= examp_regs_s2m.rvalid ;
 
-  regi.common.id.id.data <= G_ID; 
-  regi.common.version.major.data <= G_VER_MAJOR;
-  regi.common.version.minor.data <= G_VER_MINOR; 
-  regi.common.version.patch.data <= G_VER_PATCH;
-  regi.common.git.git.data <= G_GIT_HASH; 
 
+
+  examp_regs_inst : entity work.examp_regs
+  port map (
+    pi_clock => clk_100m,
+    pi_reset => srst,
+    pi_s_reset => '0', 
+    pi_s_top   => examp_regs_m2s,
+    po_s_top   => examp_regs_s2m,
+    pi_addrmap => regi,
+    po_addrmap => rego
+  );
+
+  regi.common.id.id.data <= FPGA_ID; 
+  regi.common.version.major.data <= G_VER_MAJOR;
+  regi.common.version.minor.data <= G_VER_MINOR;
+  regi.common.version.patch.data <= G_VER_PATCH;
+  regi.common.git.git.data <= G_GIT_HASH;
   regi.status.sts0.data <= rego.control.ctl0.data;
   regi.status.sts1.data <= rego.control.ctl1.data;
-
-  regi.cntr(0).cnt.incr <= '1' when rego.wr_pulse(0).data.swmod else '0';
-  regi.cntr(1).cnt.incr <= '1' when rego.wr_pulse(1).data.swmod else '0'; 
+  regi.cntr(0).cnt.incr <= '1' when rego.wr_pulse(0).data.swmod and rego.wr_pulse(0).data.data(0) else '0';
+  regi.cntr(1).cnt.incr <= '1' when rego.wr_pulse(1).data.swmod and rego.wr_pulse(1).data.data(0) else '0';
+  regi.hwrw.data.data <= x"2345_6789";
+  regi.hwrw.data.we <= swmod_ff;
+  process (clk_100m)
+  begin
+    if rising_edge(clk_100m) then
+      swmod_ff <= '1' when rego.hwrw.data.swmod = '1' and rego.hwrw.data.data = x"1234_5678" else '0';
+    end if;
+  end process;
   
 end architecture;

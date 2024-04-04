@@ -69,7 +69,6 @@ package examp_regs_pkg;
     } examp_regs__hwrw__in_t;
 
     typedef struct {
-        logic [15:0] next;
         logic incr;
     } examp_regs__cntr__cnt__in_t;
 
@@ -117,17 +116,8 @@ package examp_regs_pkg;
     } examp_regs__wr_pulse__out_t;
 
     typedef struct {
-        logic [15:0] value;
-    } examp_regs__cntr__cnt__out_t;
-
-    typedef struct {
-        examp_regs__cntr__cnt__out_t cnt;
-    } examp_regs__cntr__out_t;
-
-    typedef struct {
         examp_regs__control__out_t control;
         examp_regs__hwrw__out_t hwrw;
         examp_regs__wr_pulse__out_t wr_pulse[2];
-        examp_regs__cntr__out_t cntr[2];
     } examp_regs__out_t;
 endpackage

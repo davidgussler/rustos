@@ -88,7 +88,7 @@ For more information, see https://semver.org</p>
 - Base Offset: 0xC
 - Size: 0x4
 
-<p>The last 8 characters of the git commit hash for this fpga design.</p>
+<p>The 8 left-most characters of the git commit hash for this fpga design.</p>
 
 |Bits|Identifier|Access|Reset|Name|
 |----|----------|------|-----|----|
@@ -130,7 +130,7 @@ For more information, see https://semver.org</p>
 
 |Bits|Identifier|Access|Reset|Name|
 |----|----------|------|-----|----|
-|31:0|   data   |  rw  | 0xB |  — |
+|31:0|   data   |  rw  | 0xA |  — |
 
 ### wr_pulse register
 
@@ -141,7 +141,7 @@ For more information, see https://semver.org</p>
 - Array Stride: 0x4
 - Total Size: 0x8
 
-<p>Write pulse register. Just a write pulse</p>
+<p>Write pulse register. Just a write pulse.</p>
 
 |Bits|Identifier|Access|Reset|Name|
 |----|----------|------|-----|----|
@@ -156,7 +156,7 @@ For more information, see https://semver.org</p>
 - Array Stride: 0x4
 - Total Size: 0x8
 
-<p>Write pulse register. Just a write pulse</p>
+<p>Write pulse register. Just a write pulse.</p>
 
 |Bits|Identifier|Access|Reset|Name|
 |----|----------|------|-----|----|

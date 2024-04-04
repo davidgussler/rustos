@@ -34,7 +34,7 @@ regfile common_regfile {
 
   reg {
     name = "Git Hash Register";
-    desc = "The last 8 characters of the git commit hash for this fpga design.";
+    desc = "The 8 left-most characters of the git commit hash for this fpga design.";
     default sw = r;
     default hw = w;
     field {} git[31:0];

@@ -36,22 +36,23 @@ addrmap examp_regs {
     default we;
     default swacc;
     default swmod;
-    field {} data[32] = 0x0000000B;
+    field {} data[32] = 0x0000000A;
   } hwrw;
 
   reg {
-    desc = "Write pulse register. Just a write pulse";
+    desc = "Write pulse register. Just a write pulse.";
     default sw = w;
     default hw = r;
     default swmod;
-    field {} data = 0;
+    field {} data[0:0] = 0;
   } wr_pulse [2];
 
   reg {
     desc = "Counter register. Just a simple up counter";
     default sw = r;
+    default hw = na; 
     default counter; // is a counter that infers an increment control hardware input signal
     field {} cnt[15:0] = 0;
   } cntr [2];
-
+  
 };

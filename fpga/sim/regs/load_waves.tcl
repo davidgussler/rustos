@@ -1,0 +1,1 @@
+gtkwave::loadFile "waves.gtkw"

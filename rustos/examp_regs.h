@@ -39,7 +39,7 @@ extern "C" {
 #define COMMON_REGFILE__GIT__GIT_bw 32
 
 // Regfile - common_regfile
-typedef struct __attribute__ ((__packed__)) {
+typedef volatile struct __attribute__((packed,aligned(4))) {
     uint32_t scratchpad;
     uint32_t id;
     uint32_t version;
@@ -83,7 +83,7 @@ typedef struct __attribute__ ((__packed__)) {
 #define EXAMP_REGS__CNTR__CNT_reset 0x0
 
 // Addrmap - examp_regs
-typedef struct __attribute__ ((__packed__)) {
+typedef volatile struct __attribute__((packed,aligned(4))) {
     common_regfile_t common;
     uint32_t control;
     uint32_t status;

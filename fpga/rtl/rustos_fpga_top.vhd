@@ -5,7 +5,6 @@ use ieee.std_logic_1164.all;
 
 entity rustos_fpga_top is
   generic (
-    G_ID        : std_logic_vector(31 downto 0) := x"0000_0001"; 
     G_VER_MAJOR : std_logic_vector(7 downto 0)  := x"00";
     G_VER_MINOR : std_logic_vector(7 downto 0)  := x"01";
     G_VER_PATCH : std_logic_vector(7 downto 0)  := x"00";
@@ -28,11 +27,10 @@ architecture rtl of rustos_fpga_top is
 begin
   rustos_fpga_inst : entity work.rustos_fpga
   generic map (
-    G_ID=> G_ID,
     G_VER_MAJOR => G_VER_MAJOR,
     G_VER_MINOR => G_VER_MINOR,
-    G_VER_PATCH=> G_VER_PATCH,
-    G_GIT_HASH=> G_GIT_HASH
+    G_VER_PATCH => G_VER_PATCH,
+    G_GIT_HASH  => G_GIT_HASH
   )
   port map (
     clk_i     => clk,

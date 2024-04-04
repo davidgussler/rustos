@@ -161,12 +161,14 @@ package pkg_examp_regs is
   -- register type: cntr
   -----------------------------------------------
   type t_field_signals_cntr_cnt_in is record
-    data : std_logic_vector(16-1 downto 0); --
+    -- no data if field cannot be written from hw
+    data : std_logic_vector(-1 downto 0); --
     incr : std_logic; --
   end record;
 
   type t_field_signals_cntr_cnt_out is record
-    data : std_logic_vector(16-1 downto 0); --
+    -- no data if field cannot be written from hw
+    data : std_logic_vector(-1 downto 0); --
   end record; --
 
   -- The actual register types
@@ -552,7 +554,7 @@ begin
   ------------------------------------------------------------STORAGE
   data_storage: block
     signal l_field_reg   : std_logic_vector(32-1 downto 0) :=
-                           std_logic_vector(to_signed(11,32));
+                           std_logic_vector(to_signed(10,32));
     signal l_sw_wr_stb_q : std_logic;
     signal l_sw_rd_stb_q : std_logic;
   begin
@@ -560,7 +562,7 @@ begin
     begin
       if rising_edge(pi_clock) then
         if pi_reset = '1' then
-          l_field_reg <= std_logic_vector(to_signed(11,32));
+          l_field_reg <= std_logic_vector(to_signed(10,32));
           l_sw_wr_stb_q <= '0';
           l_sw_rd_stb_q <= '0';
         else
@@ -697,7 +699,6 @@ begin
           l_field_reg <= std_logic_vector(to_signed(0,16));
         else
           -- HW --
-          l_field_reg <= pi_reg.cnt.data;
           -- counter
           if  pi_reg.cnt.incr = '1' then
             l_field_reg <= std_logic_vector(unsigned(l_field_reg) + to_unsigned(l_incrvalue, 16));
@@ -706,8 +707,8 @@ begin
         end if;
       end if;
     end process;
-    --
-    po_reg.cnt.data <= l_field_reg; --
+    --no signal to read by HW
+    po_reg.cnt.data <= (others => '0'); --
     data_out(15 downto 0) <= l_field_reg;
 
     l_incrvalue <= 1;

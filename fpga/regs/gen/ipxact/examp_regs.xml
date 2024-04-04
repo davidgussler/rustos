@@ -88,7 +88,7 @@ For more information, see https://semver.org</ipxact:description>
           <ipxact:register>
             <ipxact:name>git</ipxact:name>
             <ipxact:displayName>Git Hash Register</ipxact:displayName>
-            <ipxact:description>The last 8 characters of the git commit hash for this fpga design.</ipxact:description>
+            <ipxact:description>The 8 left-most characters of the git commit hash for this fpga design.</ipxact:description>
             <ipxact:addressOffset>'hc</ipxact:addressOffset>
             <ipxact:size>32</ipxact:size>
             <ipxact:field>
@@ -162,7 +162,7 @@ For more information, see https://semver.org</ipxact:description>
             <ipxact:bitOffset>0</ipxact:bitOffset>
             <ipxact:resets>
               <ipxact:reset>
-                <ipxact:value>'hb</ipxact:value>
+                <ipxact:value>'ha</ipxact:value>
               </ipxact:reset>
             </ipxact:resets>
             <ipxact:bitWidth>32</ipxact:bitWidth>
@@ -172,7 +172,7 @@ For more information, see https://semver.org</ipxact:description>
         </ipxact:register>
         <ipxact:register>
           <ipxact:name>wr_pulse</ipxact:name>
-          <ipxact:description>Write pulse register. Just a write pulse</ipxact:description>
+          <ipxact:description>Write pulse register. Just a write pulse.</ipxact:description>
           <ipxact:dim>2</ipxact:dim>
           <ipxact:addressOffset>'h1c</ipxact:addressOffset>
           <ipxact:size>32</ipxact:size>

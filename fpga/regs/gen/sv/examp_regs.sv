@@ -408,7 +408,7 @@ module examp_regs (
     end
     always_ff @(posedge clk) begin
         if(rst) begin
-            field_storage.hwrw.data.value <= 32'hb;
+            field_storage.hwrw.data.value <= 32'ha;
         end else if(field_combo.hwrw.data.load_next) begin
             field_storage.hwrw.data.value <= field_combo.hwrw.data.next;
         end
@@ -448,9 +448,6 @@ module examp_regs (
             next_c = field_storage.cntr[i0].cnt.value;
             load_next_c = '0;
         
-            // HW Write
-            next_c = hwif_in.cntr[i0].cnt.next;
-            load_next_c = '1;
             if(hwif_in.cntr[i0].cnt.incr) begin // increment
                 field_combo.cntr[i0].cnt.overflow = (((17)'(next_c) + 16'h1) > 16'hffff);
                 next_c = next_c + 16'h1;
@@ -469,7 +466,6 @@ module examp_regs (
                 field_storage.cntr[i0].cnt.value <= field_combo.cntr[i0].cnt.next;
             end
         end
-        assign hwif_out.cntr[i0].cnt.value = field_storage.cntr[i0].cnt.value;
     end
 
     //--------------------------------------------------------------------------

@@ -12,3 +12,4 @@ fpga/vivado/rustos
 vivado_pid*.zip
 *.mcs
 *.prm
+*.bit
